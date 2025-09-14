@@ -4,7 +4,7 @@ import { XanoClient } from './providers/xano';
 import { SupabaseClient } from './providers/supabase';
 import { InstantDBClient } from './providers/instantdb';
 import { PostgreSQLClient } from './providers/postgresql';
-import { PrismaClient } from './providers/prisma';
+import { PrismaORMClient } from './providers/prisma';
 
 /**
  * Database Factory for creating database clients based on configuration
@@ -50,7 +50,7 @@ export class DatabaseFactory {
         return new PostgreSQLClient(config);
 
       case 'prisma':
-        return new PrismaClient(config);
+        return new PrismaORMClient(config);
 
       default:
         throw new Error(`Unsupported database provider: ${config.provider}`);
