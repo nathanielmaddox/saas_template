@@ -1,6 +1,6 @@
 # 🚀 SaaS Template
 
-A complete, production-ready SaaS application template built with **Next.js 15**, **Xano** backend, and modern web technologies. This template includes authentication, subscription management, third-party integrations, and enterprise-grade features.
+A complete, production-ready SaaS application template built with **Next.js 15**, modern backend services, and cutting-edge web technologies. This template includes authentication, subscription management, third-party integrations, and enterprise-grade features with support for multiple backend providers including Xano, Supabase, and InstantDB.
 
 ## ✨ Features
 
@@ -81,7 +81,10 @@ saas-template/
 
 ### Prerequisites
 - Node.js 18+ and npm
-- Xano account and workspace
+- Backend service account (choose one):
+  - **Xano**: Account and workspace
+  - **Supabase**: Project and database URL
+  - **InstantDB**: App ID and admin token
 - Stripe account (for payments)
 - Third-party API keys (Mapbox, Google Maps, etc.)
 
@@ -98,10 +101,21 @@ npm install
 # All environment variables are already set up in the template
 ```
 
-### 3. Configure Xano Backend
+### 3. Configure Your Backend Service
+
+#### Option A: Xano Backend
 1. Import the schema from `yaml/xano-schema.yml` to your Xano workspace
 2. Set up API endpoints based on `yaml/api-endpoints.yml`
-3. Update `NEXT_PUBLIC_XANO_API_URL` in your environment file
+3. Update `NEXT_PUBLIC_XANO_API_URL` and `XANO_API_KEY` in your environment file
+
+#### Option B: Supabase Backend
+1. Create tables based on the schema structure in `yaml/xano-schema.yml`
+2. Set up Row Level Security (RLS) policies
+3. Update `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in your environment file
+
+#### Option C: InstantDB Backend
+1. Define your schema using InstantDB's schema format
+2. Update `NEXT_PUBLIC_INSTANT_APP_ID` in your environment file
 
 ### 4. Set Up Third-Party Services
 
@@ -113,7 +127,10 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
 
 #### Required API Keys
-- **Xano**: API URL and API Key
+- **Backend Service** (choose one):
+  - **Xano**: API URL and API Key
+  - **Supabase**: Project URL and Anon Key
+  - **InstantDB**: App ID and Admin Token
 - **Stripe**: Publishable and Secret keys
 - **Google Maps**: API key with Maps JavaScript API enabled
 - **Mapbox**: Access token
@@ -163,7 +180,7 @@ npm run docker:prod      # Start production with Docker
 See `.env` for all required environment variables. Key categories:
 
 - **Core**: App name, URL, Node environment
-- **Xano**: API URL and authentication
+- **Backend**: Database provider configuration (Xano, Supabase, or InstantDB)
 - **Stripe**: Payment processing keys
 - **Maps**: Google Maps and Mapbox tokens
 - **Email**: SendGrid, Resend, or Mailgun
@@ -180,12 +197,29 @@ See `.env` for all required environment variables. Key categories:
 - **API Routes** for backend integration
 - **Middleware** for authentication and routing
 
-### Backend (Xano)
-- **Database**: PostgreSQL with Xano's visual interface
+### Backend Options
+The template supports multiple backend providers:
+
+#### Xano (Default)
+- **Database**: PostgreSQL with visual interface
 - **API**: Automatically generated REST endpoints
-- **Authentication**: JWT-based with Xano's auth system
-- **File Storage**: Xano's built-in file handling
-- **Webhooks**: For real-time integrations
+- **Authentication**: JWT-based with built-in auth system
+- **File Storage**: Built-in file handling
+- **Webhooks**: Real-time integrations
+
+#### Supabase
+- **Database**: PostgreSQL with real-time subscriptions
+- **API**: Auto-generated REST and GraphQL APIs
+- **Authentication**: Built-in auth with social providers
+- **File Storage**: Integrated storage buckets
+- **Real-time**: WebSocket subscriptions
+
+#### InstantDB
+- **Database**: Real-time relational database
+- **API**: Type-safe queries and mutations
+- **Authentication**: Social and email auth
+- **Real-time**: Live queries and subscriptions
+- **Offline**: Offline-first with sync
 
 ### Key Integrations
 - **Stripe**: Subscription billing and payments
@@ -197,8 +231,11 @@ See `.env` for all required environment variables. Key categories:
 ## 🔧 Customization
 
 ### Adding New Features
-1. **Database**: Add tables to `yaml/xano-schema.yml`
-2. **API**: Define endpoints in `yaml/api-endpoints.yml`
+1. **Database**:
+   - **Xano**: Add tables to `yaml/xano-schema.yml`
+   - **Supabase**: Use SQL migrations or dashboard
+   - **InstantDB**: Update schema in your app
+2. **API**: Configure endpoints based on your backend choice
 3. **Frontend**: Create components in `src/components/`
 4. **Styles**: Use Tailwind classes or extend `globals.css`
 

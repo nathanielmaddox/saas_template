@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a production-ready SaaS application template built with **Next.js 15** (App Router), **Xano** as the backend service, and modern web technologies. The template includes authentication, subscription management with Stripe, maps integration, analytics, and enterprise-grade features.
+This is a production-ready SaaS application template built with **Next.js 15** (App Router), multiple backend service options (Xano, Supabase, InstantDB), and modern web technologies. The template includes authentication, subscription management with Stripe, maps integration, analytics, and enterprise-grade features.
 
 ## Tech Stack
 
 - **Frontend**: Next.js 15.0.3+ (App Router, Server Components, React 19)
-- **Backend**: Xano (PostgreSQL with visual API builder)
-- **Database**: PostgreSQL via Xano
+- **Backend**: Multiple options (Xano, Supabase, InstantDB)
+- **Database**: PostgreSQL (Xano/Supabase) or Real-time DB (InstantDB)
 - **Styling**: Tailwind CSS 3.4+ with custom design system
 - **Authentication**: NextAuth.js with JWT and social providers
 - **Payments**: Stripe integration with webhook handling
@@ -27,12 +27,24 @@ This is a production-ready SaaS application template built with **Next.js 15** (
 - **API Routes**: Located in `src/app/api/` for backend integration
 - **Middleware**: Authentication and routing logic
 
-### Xano Backend Integration
-- **XanoClient**: Centralized API client in `src/lib/xano.ts`
+### Backend Integration Options
+The template supports multiple backend services with a unified interface:
+
+#### Xano Integration
+- **Client**: Centralized API client in `src/lib/database/providers/xano.ts`
 - **Authentication**: JWT-based with automatic token refresh
 - **Schema**: Database schema defined in `yaml/xano-schema.yml`
 - **API Endpoints**: Documented in `yaml/api-endpoints.yml`
-- **Webhooks**: Stripe integration via Xano webhooks
+
+#### Supabase Integration
+- **Client**: Supabase client in `src/lib/database/providers/supabase.ts`
+- **Authentication**: Built-in auth with social providers
+- **Real-time**: WebSocket subscriptions for live data
+
+#### InstantDB Integration
+- **Client**: InstantDB client in `src/lib/database/providers/instantdb.ts`
+- **Real-time**: Live queries with automatic updates
+- **Offline**: Offline-first with automatic sync
 
 ### Subscription Architecture
 - **Plans**: Configured in `src/lib/stripe.ts` (Free, Pro, Enterprise)
@@ -80,8 +92,13 @@ npm run stripe:listen    # Listen to Stripe webhooks locally
 ## Environment Configuration
 
 ### Required Environment Variables
-- **NEXT_PUBLIC_XANO_API_URL**: Xano workspace API endpoint
-- **XANO_API_KEY**: Xano API key for server-side requests
+
+#### Backend Service (choose one)
+- **Xano**: `NEXT_PUBLIC_XANO_API_URL`, `XANO_API_KEY`
+- **Supabase**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- **InstantDB**: `NEXT_PUBLIC_INSTANT_APP_ID`
+
+#### Core Services
 - **STRIPE_PUBLISHABLE_KEY** / **STRIPE_SECRET_KEY**: Stripe payment keys
 - **STRIPE_WEBHOOK_SECRET**: Stripe webhook signature verification
 - **NEXTAUTH_SECRET**: NextAuth encryption secret (32+ chars)
@@ -112,22 +129,37 @@ npm run stripe:listen    # Listen to Stripe webhooks locally
 
 ## Database & API Patterns
 
-### Xano Integration
-```typescript
-// Use the centralized XanoClient
-import { xano } from '@/lib/xano';
+The template uses a factory pattern to support multiple backend providers:
 
-// Generic resource operations
-const users = await xano.getResources<User>('users');
-const user = await xano.getResource<User>('users', userId);
-await xano.createResource('users', userData);
-await xano.updateResource('users', userId, updates);
-await xano.deleteResource('users', userId);
+```typescript
+// Use the database factory to get the appropriate client
+import { createDatabaseClient } from '@/lib/database/factory';
+
+const db = createDatabaseClient(); // Automatically chooses based on env vars
+
+// Generic resource operations (works with all providers)
+const users = await db.getResources<User>('users');
+const user = await db.getResource<User>('users', userId);
+await db.createResource('users', userData);
+await db.updateResource('users', userId, updates);
+await db.deleteResource('users', userId);
 
 // Authentication methods
-const { authToken, user } = await xano.login(email, password);
-await xano.logout();
-const currentUser = await xano.getCurrentUser();
+const { authToken, user } = await db.login(email, password);
+await db.logout();
+const currentUser = await db.getCurrentUser();
+```
+
+#### Provider-specific usage:
+```typescript
+// Xano specific
+import { xano } from '@/lib/database/providers/xano';
+
+// Supabase specific
+import { supabase } from '@/lib/database/providers/supabase';
+
+// InstantDB specific
+import { instantdb } from '@/lib/database/providers/instantdb';
 ```
 
 ### API Route Patterns
