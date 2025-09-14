@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run build:*)",
+      "Bash(npm audit:*)",
+      "Bash(npm i:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
