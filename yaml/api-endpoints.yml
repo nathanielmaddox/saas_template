@@ -1,0 +1,504 @@
+# Xano API Endpoints Configuration
+# Define all API endpoints and their structure
+
+# ======================
+# AUTHENTICATION ENDPOINTS
+# ======================
+
+auth:
+  base_path: "/auth"
+  endpoints:
+    - path: "/login"
+      method: "POST"
+      description: "User login with email/password"
+      body:
+        email: "string (required)"
+        password: "string (required)"
+        remember: "boolean (optional)"
+      response:
+        authToken: "string"
+        user: "User object"
+        expiresIn: "number"
+
+    - path: "/register"
+      method: "POST"
+      description: "User registration"
+      body:
+        email: "string (required)"
+        password: "string (required)"
+        name: "string (required)"
+        company: "string (optional)"
+      response:
+        authToken: "string"
+        user: "User object"
+        message: "string"
+
+    - path: "/logout"
+      method: "POST"
+      description: "User logout"
+      auth_required: true
+      response:
+        message: "string"
+
+    - path: "/refresh"
+      method: "POST"
+      description: "Refresh authentication token"
+      auth_required: true
+      response:
+        authToken: "string"
+        expiresIn: "number"
+
+    - path: "/me"
+      method: "GET"
+      description: "Get current user profile"
+      auth_required: true
+      response:
+        user: "User object with profile"
+
+    - path: "/me"
+      method: "PATCH"
+      description: "Update current user profile"
+      auth_required: true
+      body:
+        name: "string (optional)"
+        avatar: "string (optional)"
+        company: "string (optional)"
+        phone: "string (optional)"
+        timezone: "string (optional)"
+        preferences: "object (optional)"
+      response:
+        user: "User object"
+
+    - path: "/forgot-password"
+      method: "POST"
+      description: "Request password reset"
+      body:
+        email: "string (required)"
+      response:
+        message: "string"
+
+    - path: "/reset-password"
+      method: "POST"
+      description: "Reset password with token"
+      body:
+        token: "string (required)"
+        password: "string (required)"
+      response:
+        message: "string"
+
+    - path: "/verify-email"
+      method: "POST"
+      description: "Verify email address"
+      body:
+        token: "string (required)"
+      response:
+        message: "string"
+
+# ======================
+# USER MANAGEMENT
+# ======================
+
+users:
+  base_path: "/users"
+  auth_required: true
+  endpoints:
+    - path: ""
+      method: "GET"
+      description: "Get all users (admin only)"
+      admin_only: true
+      query_params:
+        page: "number (optional, default: 1)"
+        limit: "number (optional, default: 20)"
+        search: "string (optional)"
+        role: "string (optional)"
+        status: "string (optional)"
+      response:
+        users: "User array"
+        total: "number"
+        page: "number"
+        totalPages: "number"
+
+    - path: "/{user_id}"
+      method: "GET"
+      description: "Get user by ID"
+      response:
+        user: "User object"
+
+    - path: "/{user_id}"
+      method: "PATCH"
+      description: "Update user (admin or self)"
+      body:
+        name: "string (optional)"
+        email: "string (optional)"
+        role: "string (optional, admin only)"
+        status: "string (optional, admin only)"
+      response:
+        user: "User object"
+
+    - path: "/{user_id}"
+      method: "DELETE"
+      description: "Delete user (admin only)"
+      admin_only: true
+      response:
+        message: "string"
+
+# ======================
+# SUBSCRIPTION MANAGEMENT
+# ======================
+
+subscription:
+  base_path: "/subscription"
+  auth_required: true
+  endpoints:
+    - path: ""
+      method: "GET"
+      description: "Get current user subscription"
+      response:
+        subscription: "Subscription object"
+
+    - path: ""
+      method: "POST"
+      description: "Create or update subscription"
+      body:
+        plan_id: "string (required)"
+        payment_method_id: "string (optional)"
+      response:
+        subscription: "Subscription object"
+        client_secret: "string (for payment)"
+
+    - path: "/cancel"
+      method: "POST"
+      description: "Cancel subscription"
+      body:
+        cancel_at_period_end: "boolean (default: true)"
+      response:
+        subscription: "Subscription object"
+
+    - path: "/resume"
+      method: "POST"
+      description: "Resume cancelled subscription"
+      response:
+        subscription: "Subscription object"
+
+    - path: "/change-plan"
+      method: "POST"
+      description: "Change subscription plan"
+      body:
+        new_plan_id: "string (required)"
+        prorate: "boolean (default: true)"
+      response:
+        subscription: "Subscription object"
+
+    - path: "/usage"
+      method: "GET"
+      description: "Get current usage metrics"
+      response:
+        usage: "Usage metrics object"
+        limits: "Plan limits object"
+
+# ======================
+# PAYMENT & BILLING
+# ======================
+
+payments:
+  base_path: "/payments"
+  auth_required: true
+  endpoints:
+    - path: "/history"
+      method: "GET"
+      description: "Get payment history"
+      query_params:
+        page: "number (optional, default: 1)"
+        limit: "number (optional, default: 20)"
+      response:
+        payments: "Payment array"
+        total: "number"
+
+    - path: "/payment-methods"
+      method: "GET"
+      description: "Get saved payment methods"
+      response:
+        payment_methods: "PaymentMethod array"
+
+    - path: "/payment-methods"
+      method: "POST"
+      description: "Add payment method"
+      body:
+        payment_method_id: "string (required)"
+        set_as_default: "boolean (optional)"
+      response:
+        payment_method: "PaymentMethod object"
+
+    - path: "/payment-methods/{pm_id}"
+      method: "DELETE"
+      description: "Remove payment method"
+      response:
+        message: "string"
+
+    - path: "/invoice/{invoice_id}"
+      method: "GET"
+      description: "Get invoice details"
+      response:
+        invoice: "Invoice object"
+
+# ======================
+# PROJECT MANAGEMENT
+# ======================
+
+projects:
+  base_path: "/projects"
+  auth_required: true
+  endpoints:
+    - path: ""
+      method: "GET"
+      description: "Get user projects"
+      query_params:
+        status: "string (optional)"
+        search: "string (optional)"
+      response:
+        projects: "Project array"
+
+    - path: ""
+      method: "POST"
+      description: "Create new project"
+      body:
+        name: "string (required)"
+        description: "string (optional)"
+        settings: "object (optional)"
+      response:
+        project: "Project object"
+
+    - path: "/{project_id}"
+      method: "GET"
+      description: "Get project details"
+      response:
+        project: "Project object with members"
+
+    - path: "/{project_id}"
+      method: "PATCH"
+      description: "Update project"
+      body:
+        name: "string (optional)"
+        description: "string (optional)"
+        settings: "object (optional)"
+        status: "string (optional)"
+      response:
+        project: "Project object"
+
+    - path: "/{project_id}"
+      method: "DELETE"
+      description: "Delete project"
+      response:
+        message: "string"
+
+    - path: "/{project_id}/members"
+      method: "GET"
+      description: "Get project members"
+      response:
+        members: "ProjectMember array"
+
+    - path: "/{project_id}/members"
+      method: "POST"
+      description: "Invite team member"
+      body:
+        email: "string (required)"
+        role: "string (required)"
+        permissions: "array (optional)"
+      response:
+        member: "ProjectMember object"
+
+    - path: "/{project_id}/members/{member_id}"
+      method: "PATCH"
+      description: "Update member role/permissions"
+      body:
+        role: "string (optional)"
+        permissions: "array (optional)"
+      response:
+        member: "ProjectMember object"
+
+    - path: "/{project_id}/members/{member_id}"
+      method: "DELETE"
+      description: "Remove team member"
+      response:
+        message: "string"
+
+# ======================
+# ANALYTICS & TRACKING
+# ======================
+
+analytics:
+  base_path: "/analytics"
+  auth_required: true
+  endpoints:
+    - path: "/events"
+      method: "POST"
+      description: "Track analytics event"
+      body:
+        event_type: "string (required)"
+        event_name: "string (required)"
+        properties: "object (optional)"
+        session_id: "string (optional)"
+      response:
+        success: "boolean"
+
+    - path: "/dashboard"
+      method: "GET"
+      description: "Get dashboard analytics"
+      query_params:
+        start_date: "string (ISO date, optional)"
+        end_date: "string (ISO date, optional)"
+        granularity: "string (day/week/month, default: day)"
+      response:
+        metrics: "Analytics metrics object"
+
+    - path: "/usage"
+      method: "GET"
+      description: "Get usage statistics"
+      response:
+        current_usage: "Usage object"
+        usage_history: "Usage history array"
+
+# ======================
+# NOTIFICATIONS
+# ======================
+
+notifications:
+  base_path: "/notifications"
+  auth_required: true
+  endpoints:
+    - path: ""
+      method: "GET"
+      description: "Get user notifications"
+      query_params:
+        unread_only: "boolean (default: false)"
+        page: "number (default: 1)"
+        limit: "number (default: 20)"
+      response:
+        notifications: "Notification array"
+        unread_count: "number"
+
+    - path: "/{notification_id}/read"
+      method: "POST"
+      description: "Mark notification as read"
+      response:
+        notification: "Notification object"
+
+    - path: "/mark-all-read"
+      method: "POST"
+      description: "Mark all notifications as read"
+      response:
+        message: "string"
+
+    - path: "/{notification_id}"
+      method: "DELETE"
+      description: "Delete notification"
+      response:
+        message: "string"
+
+# ======================
+# FILE UPLOAD
+# ======================
+
+upload:
+  base_path: "/upload"
+  auth_required: true
+  endpoints:
+    - path: "/avatar"
+      method: "POST"
+      description: "Upload user avatar"
+      content_type: "multipart/form-data"
+      body:
+        file: "File (required, max 5MB)"
+      response:
+        url: "string"
+        file_id: "number"
+
+    - path: "/files"
+      method: "POST"
+      description: "Upload general files"
+      content_type: "multipart/form-data"
+      body:
+        files: "File array (required)"
+        project_id: "number (optional)"
+      response:
+        files: "Upload result array"
+
+    - path: "/files/{file_id}"
+      method: "DELETE"
+      description: "Delete uploaded file"
+      response:
+        message: "string"
+
+# ======================
+# WEBHOOKS
+# ======================
+
+webhooks:
+  base_path: "/webhooks"
+  endpoints:
+    - path: "/stripe"
+      method: "POST"
+      description: "Stripe webhook endpoint"
+      auth_required: false
+      headers:
+        stripe-signature: "string (required)"
+      response:
+        received: "boolean"
+
+    - path: "/user/{user_id}"
+      method: "GET"
+      description: "Get user webhooks"
+      auth_required: true
+      response:
+        webhooks: "Webhook array"
+
+    - path: "/user/{user_id}"
+      method: "POST"
+      description: "Create webhook"
+      auth_required: true
+      body:
+        url: "string (required)"
+        events: "array (required)"
+        secret: "string (optional)"
+      response:
+        webhook: "Webhook object"
+
+# ======================
+# API KEYS
+# ======================
+
+api_keys:
+  base_path: "/api-keys"
+  auth_required: true
+  endpoints:
+    - path: ""
+      method: "GET"
+      description: "Get user API keys"
+      response:
+        api_keys: "APIKey array (without secrets)"
+
+    - path: ""
+      method: "POST"
+      description: "Create new API key"
+      body:
+        name: "string (required)"
+        permissions: "array (optional)"
+        expires_at: "string (ISO date, optional)"
+      response:
+        api_key: "APIKey object with key"
+
+    - path: "/{key_id}"
+      method: "PATCH"
+      description: "Update API key"
+      body:
+        name: "string (optional)"
+        permissions: "array (optional)"
+        is_active: "boolean (optional)"
+      response:
+        api_key: "APIKey object"
+
+    - path: "/{key_id}"
+      method: "DELETE"
+      description: "Delete API key"
+      response:
+        message: "string"

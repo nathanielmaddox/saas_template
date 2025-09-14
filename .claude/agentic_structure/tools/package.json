@@ -1,0 +1,18 @@
+{
+  "name": "agentic-structure-monitor",
+  "version": "1.0.0",
+  "description": "Real-time folder monitoring and link updating for agentic_structure",
+  "main": "folder-monitor.js",
+  "scripts": {
+    "start": "node folder-monitor.js start",
+    "status": "node folder-monitor.js status",
+    "install-deps": "npm install",
+    "monitor": "node folder-monitor.js start"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3"
+  },
+  "keywords": ["file-monitoring", "link-management", "agentic-structure"],
+  "author": "Your Name",
+  "license": "MIT"
+}

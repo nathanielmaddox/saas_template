@@ -1,0 +1,579 @@
+# Xano Database Schema Configuration
+# This file defines the structure of your Xano database tables
+
+# ======================
+# USER MANAGEMENT TABLES
+# ======================
+
+users:
+  description: "Main user table for authentication and profiles"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    email:
+      type: "text"
+      unique: true
+      required: true
+      validation: "email"
+    password_hash:
+      type: "text"
+      required: true
+    name:
+      type: "text"
+      required: true
+    avatar:
+      type: "text"
+      description: "URL to user avatar image"
+    role:
+      type: "text"
+      enum: ["user", "admin", "moderator"]
+      default: "user"
+    email_verified:
+      type: "boolean"
+      default: false
+    email_verification_token:
+      type: "text"
+    password_reset_token:
+      type: "text"
+    password_reset_expires:
+      type: "datetime"
+    last_login:
+      type: "datetime"
+    status:
+      type: "text"
+      enum: ["active", "inactive", "suspended"]
+      default: "active"
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+user_profiles:
+  description: "Extended user profile information"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    company:
+      type: "text"
+    job_title:
+      type: "text"
+    phone:
+      type: "text"
+    timezone:
+      type: "text"
+      default: "UTC"
+    language:
+      type: "text"
+      default: "en"
+    bio:
+      type: "longtext"
+    website:
+      type: "text"
+    location:
+      type: "text"
+    social_links:
+      type: "json"
+      description: "Social media links as JSON object"
+    preferences:
+      type: "json"
+      description: "User preferences as JSON object"
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+# ======================
+# SUBSCRIPTION & BILLING
+# ======================
+
+subscriptions:
+  description: "User subscription management"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    plan:
+      type: "text"
+      enum: ["free", "pro", "enterprise"]
+      default: "free"
+    status:
+      type: "text"
+      enum: ["active", "inactive", "cancelled", "past_due", "trialing"]
+      default: "active"
+    stripe_customer_id:
+      type: "text"
+    stripe_subscription_id:
+      type: "text"
+    stripe_price_id:
+      type: "text"
+    current_period_start:
+      type: "datetime"
+    current_period_end:
+      type: "datetime"
+    trial_start:
+      type: "datetime"
+    trial_end:
+      type: "datetime"
+    cancel_at_period_end:
+      type: "boolean"
+      default: false
+    cancelled_at:
+      type: "datetime"
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+payments:
+  description: "Payment transaction history"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    subscription_id:
+      type: "integer"
+      foreign_key: "subscriptions.id"
+    stripe_payment_intent_id:
+      type: "text"
+    amount:
+      type: "decimal"
+      precision: [10, 2]
+    currency:
+      type: "text"
+      default: "usd"
+    status:
+      type: "text"
+      enum: ["pending", "succeeded", "failed", "cancelled"]
+    description:
+      type: "text"
+    metadata:
+      type: "json"
+    created_at:
+      type: "datetime"
+      auto_create: true
+
+# ======================
+# CORE APPLICATION TABLES
+# ======================
+
+projects:
+  description: "User projects/workspaces"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    name:
+      type: "text"
+      required: true
+    description:
+      type: "longtext"
+    slug:
+      type: "text"
+      unique: true
+    status:
+      type: "text"
+      enum: ["active", "inactive", "archived"]
+      default: "active"
+    settings:
+      type: "json"
+      description: "Project-specific settings"
+    metadata:
+      type: "json"
+      description: "Additional project data"
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+project_members:
+  description: "Project team members and permissions"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    project_id:
+      type: "integer"
+      foreign_key: "projects.id"
+      required: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    role:
+      type: "text"
+      enum: ["owner", "admin", "member", "viewer"]
+      default: "member"
+    permissions:
+      type: "json"
+      description: "Specific permissions array"
+    invited_by:
+      type: "integer"
+      foreign_key: "users.id"
+    invited_at:
+      type: "datetime"
+    joined_at:
+      type: "datetime"
+    status:
+      type: "text"
+      enum: ["pending", "active", "inactive"]
+      default: "pending"
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+# ======================
+# ANALYTICS & TRACKING
+# ======================
+
+analytics_events:
+  description: "User analytics and event tracking"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+    session_id:
+      type: "text"
+    event_type:
+      type: "text"
+      required: true
+    event_name:
+      type: "text"
+      required: true
+    properties:
+      type: "json"
+      description: "Event properties as JSON"
+    user_agent:
+      type: "text"
+    ip_address:
+      type: "text"
+    referrer:
+      type: "text"
+    page_url:
+      type: "text"
+    timestamp:
+      type: "datetime"
+      auto_create: true
+
+usage_metrics:
+  description: "Track feature usage and limits"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    metric_name:
+      type: "text"
+      required: true
+    value:
+      type: "integer"
+      default: 0
+    period:
+      type: "text"
+      enum: ["daily", "weekly", "monthly", "total"]
+      default: "monthly"
+    date:
+      type: "date"
+    metadata:
+      type: "json"
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+# ======================
+# NOTIFICATIONS & COMMUNICATION
+# ======================
+
+notifications:
+  description: "In-app notifications"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    type:
+      type: "text"
+      enum: ["info", "success", "warning", "error"]
+      default: "info"
+    title:
+      type: "text"
+      required: true
+    message:
+      type: "longtext"
+    action_url:
+      type: "text"
+    action_text:
+      type: "text"
+    is_read:
+      type: "boolean"
+      default: false
+    read_at:
+      type: "datetime"
+    metadata:
+      type: "json"
+    created_at:
+      type: "datetime"
+      auto_create: true
+
+email_templates:
+  description: "Email template management"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    name:
+      type: "text"
+      unique: true
+      required: true
+    subject:
+      type: "text"
+      required: true
+    html_content:
+      type: "longtext"
+      required: true
+    text_content:
+      type: "longtext"
+    variables:
+      type: "json"
+      description: "Available template variables"
+    is_active:
+      type: "boolean"
+      default: true
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+# ======================
+# FILE STORAGE & MEDIA
+# ======================
+
+file_uploads:
+  description: "Track uploaded files"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    filename:
+      type: "text"
+      required: true
+    original_filename:
+      type: "text"
+      required: true
+    file_path:
+      type: "text"
+      required: true
+    file_url:
+      type: "text"
+      required: true
+    mime_type:
+      type: "text"
+    file_size:
+      type: "integer"
+    storage_provider:
+      type: "text"
+      enum: ["local", "s3", "cloudinary"]
+      default: "local"
+    metadata:
+      type: "json"
+    is_public:
+      type: "boolean"
+      default: false
+    created_at:
+      type: "datetime"
+      auto_create: true
+
+# ======================
+# SYSTEM & CONFIGURATION
+# ======================
+
+app_settings:
+  description: "Application-wide settings"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    key:
+      type: "text"
+      unique: true
+      required: true
+    value:
+      type: "longtext"
+      required: true
+    type:
+      type: "text"
+      enum: ["string", "number", "boolean", "json"]
+      default: "string"
+    description:
+      type: "text"
+    is_public:
+      type: "boolean"
+      default: false
+    updated_at:
+      type: "datetime"
+      auto_update: true
+
+audit_logs:
+  description: "System audit trail"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+    action:
+      type: "text"
+      required: true
+    resource_type:
+      type: "text"
+    resource_id:
+      type: "integer"
+    old_values:
+      type: "json"
+    new_values:
+      type: "json"
+    ip_address:
+      type: "text"
+    user_agent:
+      type: "text"
+    timestamp:
+      type: "datetime"
+      auto_create: true
+
+# ======================
+# API & INTEGRATIONS
+# ======================
+
+api_keys:
+  description: "API key management"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    name:
+      type: "text"
+      required: true
+    key_hash:
+      type: "text"
+      required: true
+    prefix:
+      type: "text"
+      required: true
+    permissions:
+      type: "json"
+      description: "API permissions array"
+    last_used:
+      type: "datetime"
+    usage_count:
+      type: "integer"
+      default: 0
+    is_active:
+      type: "boolean"
+      default: true
+    expires_at:
+      type: "datetime"
+    created_at:
+      type: "datetime"
+      auto_create: true
+
+webhooks:
+  description: "Webhook endpoints"
+  fields:
+    id:
+      type: "integer"
+      primary_key: true
+      auto_increment: true
+    user_id:
+      type: "integer"
+      foreign_key: "users.id"
+      required: true
+    url:
+      type: "text"
+      required: true
+    events:
+      type: "json"
+      description: "Subscribed events array"
+    secret:
+      type: "text"
+    is_active:
+      type: "boolean"
+      default: true
+    last_delivery:
+      type: "datetime"
+    delivery_count:
+      type: "integer"
+      default: 0
+    failure_count:
+      type: "integer"
+      default: 0
+    created_at:
+      type: "datetime"
+      auto_create: true
+    updated_at:
+      type: "datetime"
+      auto_update: true
