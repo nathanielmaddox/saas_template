@@ -1,0 +1,320 @@
+# E-Commerce SaaS Project Template
+
+project:
+  name: "E-Commerce Platform"
+  type: "e-commerce"
+  description: |
+    Multi-vendor marketplace with product catalog, shopping cart,
+    order management, and payment processing
+
+  scope:
+    included:
+      - Product catalog management
+      - Shopping cart & checkout
+      - Order tracking
+      - Inventory management
+      - Customer accounts
+      - Vendor dashboard
+      - Payment processing
+      - Review system
+
+    excluded:
+      - Physical shipping integration
+      - Complex tax calculations
+      - Multi-language support (initially)
+      - Mobile app
+
+    constraints:
+      - Must support multiple vendors
+      - Stripe for all payments
+      - Real-time inventory updates
+
+tech_stack:
+  backend: "supabase" # Real-time for inventory
+  payment: "stripe"
+  maps: "google" # For delivery zones
+  email: "sendgrid"
+  analytics: "posthog"
+
+  custom_integrations:
+    - name: "cloudinary"
+      purpose: "Product image optimization"
+    - name: "algolia"
+      purpose: "Product search"
+
+phases:
+  phase_1:
+    name: "Core Commerce Setup"
+    duration: "1 week"
+    goals:
+      - Product database schema
+      - Vendor management system
+      - Basic product CRUD
+
+    deliverables:
+      - Product model with variants
+      - Vendor registration flow
+      - Admin product management
+
+  phase_2:
+    name: "Shopping Experience"
+    duration: "2 weeks"
+    goals:
+      - Product catalog UI
+      - Shopping cart implementation
+      - Checkout process
+      - Order management
+
+    deliverables:
+      - Product listing pages
+      - Cart persistence
+      - Stripe checkout integration
+      - Order confirmation emails
+
+  phase_3:
+    name: "Vendor Features"
+    duration: "1 week"
+    goals:
+      - Vendor dashboard
+      - Inventory management
+      - Sales analytics
+      - Payout system
+
+    deliverables:
+      - Vendor portal
+      - Real-time inventory
+      - Revenue reporting
+      - Stripe Connect integration
+
+  phase_4:
+    name: "Customer Features"
+    duration: "1 week"
+    goals:
+      - User reviews
+      - Wishlist
+      - Order history
+      - Recommendations
+
+    deliverables:
+      - Review system
+      - Saved items
+      - Purchase history
+      - Related products
+
+state:
+  current_phase: "phase_1"
+  completed_tasks: []
+  blockers: []
+  next_steps:
+    - Create product database schema
+    - Set up vendor registration
+    - Build product management UI
+
+features:
+  product_catalog:
+    name: "Product Catalog"
+    priority: "high"
+    status: "planned"
+    description: "Browse and search products with filters"
+
+    requirements:
+      - Category hierarchy
+      - Price filtering
+      - Search functionality
+      - Product variants (size, color)
+      - Image galleries
+
+    ui_components:
+      - ProductCard
+      - ProductGrid
+      - FilterSidebar
+      - SearchBar
+      - CategoryNav
+
+    api_endpoints:
+      - GET /api/products
+      - GET /api/products/[id]
+      - GET /api/categories
+      - POST /api/products/search
+
+    database_tables:
+      - products
+      - categories
+      - product_variants
+      - product_images
+
+  shopping_cart:
+    name: "Shopping Cart"
+    priority: "high"
+    status: "planned"
+    description: "Persistent shopping cart with real-time updates"
+
+    requirements:
+      - Add/remove items
+      - Quantity updates
+      - Price calculations
+      - Stock validation
+      - Guest checkout
+
+    ui_components:
+      - CartDrawer
+      - CartItem
+      - CartSummary
+      - CheckoutButton
+
+    api_endpoints:
+      - GET /api/cart
+      - POST /api/cart/add
+      - PUT /api/cart/update
+      - DELETE /api/cart/remove
+
+    database_tables:
+      - carts
+      - cart_items
+
+  order_management:
+    name: "Order Management"
+    priority: "high"
+    status: "planned"
+    description: "Complete order lifecycle management"
+
+    requirements:
+      - Order placement
+      - Payment processing
+      - Status tracking
+      - Email notifications
+      - Refund handling
+
+    ui_components:
+      - OrderSummary
+      - OrderTimeline
+      - OrderDetails
+      - TrackingInfo
+
+    api_endpoints:
+      - POST /api/orders/create
+      - GET /api/orders/[id]
+      - PUT /api/orders/[id]/status
+      - POST /api/orders/[id]/refund
+
+    database_tables:
+      - orders
+      - order_items
+      - order_status_history
+
+database:
+  tables:
+    products:
+      name: "products"
+      purpose: "Store product information"
+      relationships:
+        - "belongs_to vendors"
+        - "has_many product_variants"
+        - "has_many product_images"
+        - "belongs_to_many categories"
+
+    vendors:
+      name: "vendors"
+      purpose: "Store vendor information"
+      relationships:
+        - "has_many products"
+        - "has_many orders"
+
+    orders:
+      name: "orders"
+      purpose: "Store customer orders"
+      relationships:
+        - "belongs_to users"
+        - "has_many order_items"
+        - "belongs_to vendors"
+
+    carts:
+      name: "carts"
+      purpose: "Store shopping cart data"
+      relationships:
+        - "belongs_to users (optional)"
+        - "has_many cart_items"
+
+ui_specifications:
+  theme: "modern"
+  primary_color: "#4F46E5"
+
+  key_pages:
+    - name: "Homepage"
+      route: "/"
+      purpose: "Landing page with featured products"
+
+    - name: "Product Catalog"
+      route: "/products"
+      purpose: "Browse all products"
+
+    - name: "Product Detail"
+      route: "/products/[id]"
+      purpose: "Single product view"
+
+    - name: "Shopping Cart"
+      route: "/cart"
+      purpose: "Review cart items"
+
+    - name: "Checkout"
+      route: "/checkout"
+      purpose: "Complete purchase"
+
+    - name: "Vendor Dashboard"
+      route: "/vendor/dashboard"
+      purpose: "Vendor management interface"
+
+    - name: "Order History"
+      route: "/orders"
+      purpose: "Customer order tracking"
+
+testing:
+  unit_tests: true
+  integration_tests: true
+  e2e_tests: true
+
+  critical_paths:
+    - "Add to cart → Checkout → Payment"
+    - "Vendor product creation"
+    - "Order fulfillment workflow"
+    - "Inventory updates"
+
+deployment:
+  platform: "vercel"
+  environment_variables:
+    - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    - STRIPE_SECRET_KEY
+    - STRIPE_WEBHOOK_SECRET
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - SENDGRID_API_KEY
+    - CLOUDINARY_URL
+    - ALGOLIA_APP_ID
+    - ALGOLIA_API_KEY
+
+  domains:
+    production: "shop.example.com"
+    staging: "staging-shop.example.com"
+
+progress:
+  last_updated: "2024-01-01"
+  completion_percentage: 0
+
+  completed_milestones: []
+
+  upcoming_milestones:
+    - milestone: "MVP Launch"
+      target_date: "2024-02-01"
+
+    - milestone: "Vendor Onboarding"
+      target_date: "2024-02-15"
+
+    - milestone: "Public Beta"
+      target_date: "2024-03-01"
+
+notes: |
+  - Focus on B2C marketplace model initially
+  - Vendor payouts via Stripe Connect
+  - Consider adding subscription tier for vendors
+  - Mobile-first responsive design essential
+  - SEO optimization for product pages critical

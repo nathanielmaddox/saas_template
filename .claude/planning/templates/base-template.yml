@@ -1,0 +1,179 @@
+# Base SaaS Project Template
+# Copy and customize this for your specific SaaS type
+
+project:
+  name: "PROJECT_NAME"
+  type: "SAAS_TYPE" # e.g., e-commerce, crm, analytics, marketplace
+  description: |
+    Brief description of what this SaaS application does
+
+  # Project boundaries and constraints
+  scope:
+    included:
+      - Core feature 1
+      - Core feature 2
+      - Core feature 3
+
+    excluded:
+      - Feature to avoid 1
+      - Feature to avoid 2
+
+    constraints:
+      - Must use existing template structure
+      - No modifications to core authentication
+      - Maintain subscription model
+
+# Technology decisions locked for this project
+tech_stack:
+  backend: "xano" # or supabase, instantdb
+  payment: "stripe"
+  maps: "google" # or mapbox, none
+  email: "sendgrid" # or postmark, resend
+  analytics: "posthog" # or mixpanel, segment
+
+  custom_integrations:
+    - name: "integration_name"
+      purpose: "what it's for"
+
+# Implementation roadmap
+phases:
+  phase_1:
+    name: "Foundation"
+    duration: "1 week"
+    goals:
+      - Set up database schema
+      - Configure authentication
+      - Basic UI structure
+
+    deliverables:
+      - Working authentication flow
+      - Database models created
+      - Basic navigation
+
+  phase_2:
+    name: "Core Features"
+    duration: "2 weeks"
+    goals:
+      - Implement main business logic
+      - Create key UI components
+      - Set up API endpoints
+
+    deliverables:
+      - Feature 1 complete
+      - Feature 2 complete
+      - API integration working
+
+  phase_3:
+    name: "Polish & Launch"
+    duration: "1 week"
+    goals:
+      - Testing and bug fixes
+      - Performance optimization
+      - Deployment preparation
+
+    deliverables:
+      - All tests passing
+      - Production deployment
+      - Documentation complete
+
+# Current project state
+state:
+  current_phase: "phase_1"
+  completed_tasks: []
+  blockers: []
+  next_steps:
+    - Task 1
+    - Task 2
+    - Task 3
+
+# Feature specifications
+features:
+  feature_1:
+    name: "Feature Name"
+    priority: "high" # high, medium, low
+    status: "planned" # planned, in_progress, completed
+    description: "What this feature does"
+
+    requirements:
+      - Requirement 1
+      - Requirement 2
+
+    ui_components:
+      - Component 1
+      - Component 2
+
+    api_endpoints:
+      - GET /api/endpoint1
+      - POST /api/endpoint2
+
+    database_tables:
+      - table_name_1
+      - table_name_2
+
+# Database schema requirements
+database:
+  tables:
+    table_1:
+      name: "table_name"
+      purpose: "what this table stores"
+      relationships:
+        - "Related to table_2"
+
+    table_2:
+      name: "another_table"
+      purpose: "what this stores"
+
+# UI/UX specifications
+ui_specifications:
+  theme: "professional" # professional, modern, playful, minimal
+  primary_color: "#000000"
+
+  key_pages:
+    - name: "Dashboard"
+      route: "/dashboard"
+      purpose: "Main user interface"
+
+    - name: "Settings"
+      route: "/settings"
+      purpose: "User configuration"
+
+# Testing requirements
+testing:
+  unit_tests: true
+  integration_tests: true
+  e2e_tests: false
+
+  critical_paths:
+    - "User registration flow"
+    - "Payment processing"
+    - "Core feature workflow"
+
+# Deployment configuration
+deployment:
+  platform: "vercel" # vercel, aws, gcp, docker
+  environment_variables:
+    - REQUIRED_VAR_1
+    - REQUIRED_VAR_2
+
+  domains:
+    production: "app.example.com"
+    staging: "staging.example.com"
+
+# Progress tracking
+progress:
+  last_updated: "2024-01-01"
+  completion_percentage: 0
+
+  completed_milestones: []
+
+  upcoming_milestones:
+    - milestone: "MVP Launch"
+      target_date: "2024-02-01"
+
+    - milestone: "Beta Release"
+      target_date: "2024-03-01"
+
+# Notes and decisions
+notes: |
+  Any important decisions, constraints, or context that should persist
+  across development sessions go here.

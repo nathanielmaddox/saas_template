@@ -1,0 +1,121 @@
+{
+  "browser": "chromium",
+  "headless": true,
+  "defaultTimeout": 30000,
+  "navigationTimeout": 30000,
+  "actionTimeout": 10000,
+  "screenshotQuality": 90,
+  "videoRecording": false,
+  "traceRecording": true,
+  "networkMonitoring": true,
+  "consoleMonitoring": true,
+  "accessibilityTesting": true,
+  "viewportPresets": {
+    "mobile": [
+      {
+        "name": "iPhone_SE",
+        "width": 375,
+        "height": 667,
+        "deviceScaleFactor": 2,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      {
+        "name": "iPhone_14_Pro",
+        "width": 393,
+        "height": 852,
+        "deviceScaleFactor": 3,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      {
+        "name": "Samsung_Galaxy_S21",
+        "width": 360,
+        "height": 800,
+        "deviceScaleFactor": 3,
+        "isMobile": true,
+        "hasTouch": true
+      }
+    ],
+    "tablet": [
+      {
+        "name": "iPad_Mini",
+        "width": 768,
+        "height": 1024,
+        "deviceScaleFactor": 2,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      {
+        "name": "iPad_Pro_11",
+        "width": 834,
+        "height": 1194,
+        "deviceScaleFactor": 2,
+        "isMobile": true,
+        "hasTouch": true
+      }
+    ],
+    "desktop": [
+      {
+        "name": "Desktop_HD",
+        "width": 1366,
+        "height": 768,
+        "deviceScaleFactor": 1,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      {
+        "name": "Desktop_Full_HD",
+        "width": 1920,
+        "height": 1080,
+        "deviceScaleFactor": 1,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      {
+        "name": "Desktop_4K",
+        "width": 2560,
+        "height": 1440,
+        "deviceScaleFactor": 1,
+        "isMobile": false,
+        "hasTouch": false
+      }
+    ]
+  },
+  "testFlows": {
+    "authentication": {
+      "login": true,
+      "logout": true,
+      "register": true,
+      "passwordReset": true,
+      "socialAuth": true
+    },
+    "navigation": {
+      "mainMenu": true,
+      "mobileMenu": true,
+      "breadcrumbs": true,
+      "footer": true
+    },
+    "forms": {
+      "validation": true,
+      "submission": true,
+      "errorHandling": true
+    },
+    "responsive": {
+      "breakpoints": true,
+      "orientation": true,
+      "touchGestures": true
+    }
+  },
+  "retryAttempts": 3,
+  "parallelExecution": true,
+  "maxParallelTests": 4,
+  "cleanupOldScreenshots": true,
+  "screenshotRetentionDays": 7,
+  "reportFormat": "markdown",
+  "notifyAgents": [
+    "frontend-development-manager",
+    "ui-development-lead",
+    "quality-assurance-manager"
+  ]
+}

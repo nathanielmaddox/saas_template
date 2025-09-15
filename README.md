@@ -187,6 +187,33 @@ See `.env` for all required environment variables. Key categories:
 - **Analytics**: PostHog, Sentry, Google Analytics
 - **Storage**: AWS S3, Cloudinary
 - **Auth**: NextAuth and JWT secrets
+- **MCP**: Xano MCP server for Claude Code integration
+
+### Claude Code MCP Integration
+
+This template supports direct database access via Claude Code with the Xano MCP server:
+
+```bash
+# 1. Set your Xano MCP credentials in .env
+XANO_MCP_SSE_URL=https://your-workspace.xano.io/x2/mcp/meta/mcp/sse
+XANO_MCP_AUTH_TOKEN=your_xano_mcp_bearer_token
+
+# 2. Add MCP server to Claude Code
+claude mcp add-json xano '{
+  "type": "sse",
+  "url": "https://your-workspace.xano.io/x2/mcp/meta/mcp/sse",
+  "headers": ["Authorization: Bearer YOUR_XANO_MCP_TOKEN"]
+}'
+
+# 3. Verify connection
+claude mcp list
+```
+
+This enables Claude to directly:
+- Query and modify your Xano database
+- Inspect and update your schema
+- Execute Xano functions
+- Manage API endpoints
 
 ## 🏗️ Architecture
 

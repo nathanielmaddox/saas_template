@@ -1,0 +1,309 @@
+# Analytics SaaS Project Template
+
+project:
+  name: "Analytics Platform"
+  type: "analytics"
+  description: |
+    Business intelligence and analytics platform with dashboards,
+    data visualization, reporting, and real-time metrics
+
+  scope:
+    included:
+      - Custom dashboards
+      - Data visualization
+      - Real-time metrics
+      - Report generation
+      - Data connectors
+      - User analytics
+      - Export capabilities
+      - Alerting system
+
+    excluded:
+      - ETL pipeline builder
+      - Machine learning models
+      - Data warehouse management
+      - Custom SQL editor (initially)
+
+    constraints:
+      - Must handle real-time data
+      - Support multiple data sources
+      - Responsive visualizations
+      - Export to common formats
+
+tech_stack:
+  backend: "supabase" # Real-time data updates
+  payment: "stripe"
+  maps: "mapbox" # For geo-analytics
+  email: "sendgrid"
+  analytics: "posthog"
+
+  custom_integrations:
+    - name: "recharts"
+      purpose: "Data visualization library"
+    - name: "d3"
+      purpose: "Advanced visualizations"
+    - name: "papaparse"
+      purpose: "CSV data parsing"
+
+phases:
+  phase_1:
+    name: "Data Foundation"
+    duration: "1 week"
+    goals:
+      - Data model design
+      - Connector framework
+      - Basic ingestion
+
+    deliverables:
+      - Data source connections
+      - Metrics definitions
+      - Data storage schema
+
+  phase_2:
+    name: "Visualization Engine"
+    duration: "2 weeks"
+    goals:
+      - Chart components
+      - Dashboard builder
+      - Widget library
+      - Interactive features
+
+    deliverables:
+      - 10+ chart types
+      - Drag-drop dashboard
+      - Responsive widgets
+      - Real-time updates
+
+  phase_3:
+    name: "Reporting System"
+    duration: "1 week"
+    goals:
+      - Report templates
+      - Scheduling system
+      - Export functionality
+      - Email delivery
+
+    deliverables:
+      - Report builder
+      - PDF/CSV export
+      - Automated reports
+      - Report sharing
+
+  phase_4:
+    name: "Advanced Analytics"
+    duration: "1 week"
+    goals:
+      - Cohort analysis
+      - Funnel visualization
+      - Predictive metrics
+      - Custom calculations
+
+    deliverables:
+      - Cohort tools
+      - Funnel builder
+      - Trend analysis
+      - Formula editor
+
+state:
+  current_phase: "phase_1"
+  completed_tasks: []
+  blockers: []
+  next_steps:
+    - Design metrics schema
+    - Create data connectors
+    - Build ingestion API
+
+features:
+  dashboard_builder:
+    name: "Dashboard Builder"
+    priority: "high"
+    status: "planned"
+    description: "Drag-drop dashboard creation with widgets"
+
+    requirements:
+      - Grid layout system
+      - Widget library
+      - Responsive design
+      - Save/load dashboards
+      - Sharing capabilities
+
+    ui_components:
+      - DashboardGrid
+      - WidgetContainer
+      - ChartWidget
+      - MetricCard
+      - FilterPanel
+
+    api_endpoints:
+      - GET /api/dashboards
+      - POST /api/dashboards
+      - PUT /api/dashboards/[id]
+      - POST /api/dashboards/[id]/share
+
+    database_tables:
+      - dashboards
+      - dashboard_widgets
+      - widget_configurations
+
+  data_visualization:
+    name: "Data Visualization"
+    priority: "high"
+    status: "planned"
+    description: "Rich chart library with interactive features"
+
+    requirements:
+      - Line charts
+      - Bar charts
+      - Pie charts
+      - Heatmaps
+      - Scatter plots
+      - Geographic maps
+
+    ui_components:
+      - LineChart
+      - BarChart
+      - PieChart
+      - HeatMap
+      - ScatterPlot
+      - GeoMap
+
+    api_endpoints:
+      - GET /api/data/query
+      - POST /api/data/aggregate
+      - GET /api/data/timeseries
+
+    database_tables:
+      - data_sources
+      - metrics
+      - aggregations
+
+  reporting:
+    name: "Reporting System"
+    priority: "medium"
+    status: "planned"
+    description: "Automated report generation and distribution"
+
+    requirements:
+      - Report templates
+      - Schedule configuration
+      - Multiple formats
+      - Email delivery
+      - Report history
+
+    ui_components:
+      - ReportBuilder
+      - ReportTemplate
+      - ScheduleForm
+      - ReportViewer
+
+    api_endpoints:
+      - GET /api/reports
+      - POST /api/reports/generate
+      - POST /api/reports/schedule
+      - GET /api/reports/[id]/export
+
+    database_tables:
+      - reports
+      - report_schedules
+      - report_deliveries
+
+database:
+  tables:
+    data_sources:
+      name: "data_sources"
+      purpose: "Store data source configurations"
+      relationships:
+        - "has_many metrics"
+        - "has_many data_points"
+
+    metrics:
+      name: "metrics"
+      purpose: "Define calculated metrics"
+      relationships:
+        - "belongs_to data_sources"
+        - "has_many aggregations"
+
+    dashboards:
+      name: "dashboards"
+      purpose: "Store dashboard configurations"
+      relationships:
+        - "belongs_to users"
+        - "has_many dashboard_widgets"
+
+    data_points:
+      name: "data_points"
+      purpose: "Store time-series data"
+      relationships:
+        - "belongs_to data_sources"
+
+ui_specifications:
+  theme: "modern"
+  primary_color: "#8B5CF6"
+
+  key_pages:
+    - name: "Dashboard"
+      route: "/dashboard"
+      purpose: "Main analytics dashboard"
+
+    - name: "Explorer"
+      route: "/explorer"
+      purpose: "Data exploration interface"
+
+    - name: "Reports"
+      route: "/reports"
+      purpose: "Report management"
+
+    - name: "Data Sources"
+      route: "/sources"
+      purpose: "Manage data connections"
+
+    - name: "Alerts"
+      route: "/alerts"
+      purpose: "Configure metric alerts"
+
+testing:
+  unit_tests: true
+  integration_tests: true
+  e2e_tests: true
+
+  critical_paths:
+    - "Data ingestion → Processing → Visualization"
+    - "Dashboard creation workflow"
+    - "Report generation and export"
+    - "Real-time data updates"
+
+deployment:
+  platform: "vercel"
+  environment_variables:
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - STRIPE_SECRET_KEY
+    - SENDGRID_API_KEY
+    - NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+
+  domains:
+    production: "analytics.example.com"
+    staging: "staging-analytics.example.com"
+
+progress:
+  last_updated: "2024-01-01"
+  completion_percentage: 0
+
+  completed_milestones: []
+
+  upcoming_milestones:
+    - milestone: "Data Pipeline Complete"
+      target_date: "2024-02-01"
+
+    - milestone: "Dashboard Builder Launch"
+      target_date: "2024-02-15"
+
+    - milestone: "Public Beta"
+      target_date: "2024-03-01"
+
+notes: |
+  - Performance critical for large datasets
+  - Consider caching strategy for computed metrics
+  - Real-time updates via WebSocket essential
+  - Mobile-responsive charts important
+  - Consider adding AI insights in future phases

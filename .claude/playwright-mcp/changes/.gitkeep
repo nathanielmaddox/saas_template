@@ -1,0 +1,13 @@
+# Screenshot Storage Directory
+
+This directory stores all screenshots captured by the Playwright MCP during test sessions.
+
+## Directory Structure
+- Each test session creates a subdirectory with format: `[test_session_id]/`
+- Screenshots are organized by test flow and viewport
+- Files older than 7 days are automatically cleaned up
+
+## File Naming Convention
+`{viewport}_{flow}_{step}_{timestamp}.png`
+
+Example: `iPhone_14_Pro_login_form_filled_20250915_143022.png`

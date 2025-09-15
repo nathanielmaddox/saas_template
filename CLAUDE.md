@@ -35,6 +35,7 @@ The template supports multiple backend services with a unified interface:
 - **Authentication**: JWT-based with automatic token refresh
 - **Schema**: Database schema defined in `yaml/xano-schema.yml`
 - **API Endpoints**: Documented in `yaml/api-endpoints.yml`
+- **MCP Server**: Configure Xano MCP server for direct database access via Claude
 
 #### Supabase Integration
 - **Client**: Supabase client in `src/lib/database/providers/supabase.ts`
@@ -88,6 +89,38 @@ npm run docker:prod      # Start with Docker Compose (prod)
 # Stripe Development
 npm run stripe:listen    # Listen to Stripe webhooks locally
 ```
+
+## MCP Server Configuration
+
+### Xano MCP Server Setup
+To enable direct Xano database access via Claude Code, configure the Xano MCP server:
+
+1. **Set Environment Variables** in `.env`:
+```bash
+# Xano MCP Server Configuration
+XANO_MCP_SSE_URL=https://your-xano-workspace.xano.io/x2/mcp/meta/mcp/sse
+XANO_MCP_AUTH_TOKEN=your_xano_mcp_bearer_token_here
+```
+
+2. **Add MCP Server to Claude Code**:
+```bash
+claude mcp add-json xano '{
+  "type": "sse",
+  "url": "https://your-xano-workspace.xano.io/x2/mcp/meta/mcp/sse",
+  "headers": ["Authorization: Bearer YOUR_XANO_MCP_TOKEN"]
+}'
+```
+
+3. **Verify Connection**:
+```bash
+claude mcp list
+```
+
+The Xano MCP server provides:
+- Direct database queries and mutations
+- Real-time schema introspection
+- Function execution and testing
+- Automatic API endpoint management
 
 ## Environment Configuration
 
@@ -170,16 +203,70 @@ import { instantdb } from '@/lib/database/providers/instantdb';
 
 ## Testing Strategy
 
+### CRITICAL: Automatic Playwright MCP Testing on UI Changes
+**⚠️ MANDATORY**: When ANY of the following UI changes occur, you MUST immediately invoke Playwright MCP for multi-viewport testing:
+
+#### Triggers for Immediate Playwright MCP Testing:
+1. **Component Changes**:
+   - Creating new components in `src/components/`
+   - Modifying existing component JSX/TSX structure
+   - Updating component props or state management
+   - Adding/removing UI elements
+
+2. **Styling Changes**:
+   - Tailwind CSS class modifications
+   - Theme or color scheme updates
+   - Responsive breakpoint changes
+   - Animation or transition updates
+
+3. **Page/Route Changes**:
+   - New pages in `src/app/`
+   - Layout modifications
+   - Navigation structure changes
+   - Route parameter updates
+
+4. **Form Changes**:
+   - Form field additions/removals
+   - Validation logic updates
+   - Submit handler modifications
+   - Error message changes
+
+5. **Interactive Elements**:
+   - Button click handlers
+   - Modal/dialog implementations
+   - Dropdown/select modifications
+   - Toggle/switch updates
+
+#### Playwright MCP Testing Protocol:
+```bash
+# AUTOMATICALLY TRIGGERED - DO NOT SKIP
+# When UI changes detected, immediately:
+1. Save all file changes
+2. Invoke Playwright MCP with test scenario
+3. Capture screenshots across all 8 viewports
+4. Store results in .claude/playwright-mcp/changes/
+5. Analyze results for visual consistency
+6. Report any issues to UI Development Lead
+```
+
 ### Test Structure
 - **Unit Tests**: `src/**/__tests__/` or `src/**/*.test.tsx`
 - **Component Tests**: React Testing Library with Jest
 - **API Tests**: Mock Xano client for API route testing
-- **E2E Tests**: Consider Playwright for critical user flows
+- **E2E Tests**: Playwright MCP for ALL UI changes (MANDATORY)
+- **Visual Tests**: Automatic screenshot capture via Playwright MCP
+
+### Playwright MCP Integration
+- **Screenshot Storage**: `.claude/playwright-mcp/changes/[session_id]/`
+- **Viewport Testing**: 8 viewports (3 mobile, 2 tablet, 3 desktop) - ALWAYS TEST ALL
+- **Test Reports**: Markdown reports with visual evidence
+- **Agent Coordination**: Results shared with Frontend Testing, UI Lead, and QA Manager
 
 ### Testing Utilities
 - **Module Aliases**: Use `@/` prefix for imports (configured in `jest.config.js`)
 - **Coverage**: 70% threshold for branches, functions, lines, statements
 - **Mocking**: Mock external services (Stripe, Xano, Maps) in tests
+- **Visual Regression**: Playwright MCP screenshot comparison
 
 ## AI Agent Integration
 
@@ -267,5 +354,39 @@ docker-compose up --build
 2. **API**: Document endpoints in `yaml/api-endpoints.yml`
 3. **Types**: Define TypeScript interfaces
 4. **Components**: Create reusable UI components
-5. **Tests**: Write unit tests for new functionality
-6. **Documentation**: Update relevant documentation
+5. **⚠️ PLAYWRIGHT TESTING**: IMMEDIATELY run Playwright MCP for ANY UI changes
+6. **Tests**: Write unit tests for new functionality
+7. **Documentation**: Update relevant documentation
+
+## CRITICAL UI Testing Requirements
+
+### ⚠️ MANDATORY Playwright MCP Execution
+**YOU MUST IMMEDIATELY INVOKE PLAYWRIGHT MCP WHEN**:
+- Creating or modifying ANY React/Next.js component
+- Changing ANY Tailwind CSS classes or styles
+- Adding or updating ANY page in `src/app/`
+- Modifying ANY form, button, or interactive element
+- Updating ANY navigation or routing logic
+- Changing ANY responsive design breakpoints
+- Adding or removing ANY UI elements
+
+### Playwright MCP Command Structure
+When UI changes are made, IMMEDIATELY execute:
+```typescript
+// REQUIRED: Invoke Playwright MCP for UI testing
+await playwrightMCP.test({
+  scenario: "Test [specific feature/component]",
+  viewports: "all", // ALWAYS test all 8 viewports
+  captureScreenshots: true,
+  storageLocation: ".claude/playwright-mcp/changes/",
+  notifyAgents: ["frontend-testing", "ui-development-lead", "quality-assurance-manager"]
+});
+```
+
+### NO EXCEPTIONS Policy
+- **DO NOT** skip Playwright testing "to save time"
+- **DO NOT** assume changes are "too small" to test
+- **DO NOT** defer testing to later
+- **ALWAYS** test immediately after UI changes
+- **ALWAYS** capture screenshots for all 8 viewports
+- **ALWAYS** store results in the designated changes folder

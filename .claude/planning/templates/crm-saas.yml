@@ -1,0 +1,319 @@
+# CRM SaaS Project Template
+
+project:
+  name: "CRM Platform"
+  type: "crm"
+  description: |
+    Customer Relationship Management system with contact management,
+    deal tracking, pipeline visualization, and team collaboration
+
+  scope:
+    included:
+      - Contact management
+      - Lead tracking
+      - Deal pipeline
+      - Task management
+      - Email integration
+      - Activity timeline
+      - Team collaboration
+      - Reports & analytics
+
+    excluded:
+      - Email marketing campaigns
+      - Phone system integration
+      - Custom field builder (initially)
+      - API integrations (phase 2)
+
+    constraints:
+      - Must support team hierarchies
+      - Real-time collaboration required
+      - Mobile-responsive essential
+
+tech_stack:
+  backend: "supabase" # Real-time collaboration
+  payment: "stripe"
+  maps: "none"
+  email: "sendgrid"
+  analytics: "posthog"
+
+  custom_integrations:
+    - name: "calendar"
+      purpose: "Meeting scheduling"
+    - name: "slack"
+      purpose: "Team notifications"
+
+phases:
+  phase_1:
+    name: "Core CRM Setup"
+    duration: "1 week"
+    goals:
+      - Contact database schema
+      - Company management
+      - User roles & permissions
+
+    deliverables:
+      - Contact CRUD operations
+      - Company associations
+      - Role-based access control
+
+  phase_2:
+    name: "Sales Pipeline"
+    duration: "2 weeks"
+    goals:
+      - Deal management
+      - Pipeline stages
+      - Drag-drop interface
+      - Deal analytics
+
+    deliverables:
+      - Kanban pipeline view
+      - Deal stage automation
+      - Pipeline reporting
+      - Revenue forecasting
+
+  phase_3:
+    name: "Collaboration"
+    duration: "1 week"
+    goals:
+      - Activity feed
+      - Task assignments
+      - Team notifications
+      - Comments system
+
+    deliverables:
+      - Real-time activity stream
+      - Task management
+      - @mentions system
+      - Email notifications
+
+  phase_4:
+    name: "Analytics & Reporting"
+    duration: "1 week"
+    goals:
+      - Sales dashboards
+      - Custom reports
+      - Export functionality
+      - KPI tracking
+
+    deliverables:
+      - Dashboard widgets
+      - Report builder
+      - CSV/PDF exports
+      - Automated reports
+
+state:
+  current_phase: "phase_1"
+  completed_tasks: []
+  blockers: []
+  next_steps:
+    - Design contact schema
+    - Create company relationships
+    - Build contact UI
+
+features:
+  contact_management:
+    name: "Contact Management"
+    priority: "high"
+    status: "planned"
+    description: "Comprehensive contact and company management"
+
+    requirements:
+      - Contact profiles
+      - Company associations
+      - Contact segmentation
+      - Custom fields
+      - Import/export
+
+    ui_components:
+      - ContactCard
+      - ContactForm
+      - ContactList
+      - ContactDetails
+      - CompanyCard
+
+    api_endpoints:
+      - GET /api/contacts
+      - POST /api/contacts
+      - PUT /api/contacts/[id]
+      - GET /api/companies
+      - POST /api/contacts/import
+
+    database_tables:
+      - contacts
+      - companies
+      - contact_fields
+      - contact_segments
+
+  deal_pipeline:
+    name: "Deal Pipeline"
+    priority: "high"
+    status: "planned"
+    description: "Visual sales pipeline with drag-drop"
+
+    requirements:
+      - Multiple pipelines
+      - Custom stages
+      - Deal values
+      - Probability scoring
+      - Stage automation
+
+    ui_components:
+      - PipelineBoard
+      - DealCard
+      - StageColumn
+      - DealModal
+      - PipelineSettings
+
+    api_endpoints:
+      - GET /api/pipelines
+      - GET /api/deals
+      - PUT /api/deals/[id]/stage
+      - POST /api/deals
+
+    database_tables:
+      - pipelines
+      - pipeline_stages
+      - deals
+      - deal_activities
+
+  task_management:
+    name: "Task Management"
+    priority: "medium"
+    status: "planned"
+    description: "Task assignment and tracking"
+
+    requirements:
+      - Task creation
+      - Due dates
+      - Assignments
+      - Priorities
+      - Reminders
+
+    ui_components:
+      - TaskList
+      - TaskCard
+      - TaskForm
+      - TaskCalendar
+
+    api_endpoints:
+      - GET /api/tasks
+      - POST /api/tasks
+      - PUT /api/tasks/[id]
+      - POST /api/tasks/[id]/complete
+
+    database_tables:
+      - tasks
+      - task_assignments
+      - task_comments
+
+database:
+  tables:
+    contacts:
+      name: "contacts"
+      purpose: "Store individual contacts"
+      relationships:
+        - "belongs_to companies"
+        - "has_many activities"
+        - "has_many deals"
+        - "belongs_to users (owner)"
+
+    companies:
+      name: "companies"
+      purpose: "Store company information"
+      relationships:
+        - "has_many contacts"
+        - "has_many deals"
+
+    deals:
+      name: "deals"
+      purpose: "Store sales opportunities"
+      relationships:
+        - "belongs_to contacts"
+        - "belongs_to companies"
+        - "belongs_to pipeline_stages"
+        - "belongs_to users (owner)"
+
+    activities:
+      name: "activities"
+      purpose: "Track all CRM activities"
+      relationships:
+        - "belongs_to contacts"
+        - "belongs_to deals"
+        - "belongs_to users"
+
+ui_specifications:
+  theme: "professional"
+  primary_color: "#0EA5E9"
+
+  key_pages:
+    - name: "Dashboard"
+      route: "/dashboard"
+      purpose: "Sales metrics and activity overview"
+
+    - name: "Contacts"
+      route: "/contacts"
+      purpose: "Contact list and management"
+
+    - name: "Pipeline"
+      route: "/pipeline"
+      purpose: "Deal pipeline visualization"
+
+    - name: "Tasks"
+      route: "/tasks"
+      purpose: "Task management interface"
+
+    - name: "Reports"
+      route: "/reports"
+      purpose: "Analytics and reporting"
+
+    - name: "Settings"
+      route: "/settings"
+      purpose: "CRM configuration"
+
+testing:
+  unit_tests: true
+  integration_tests: true
+  e2e_tests: true
+
+  critical_paths:
+    - "Contact creation → Deal creation → Pipeline movement"
+    - "Task assignment workflow"
+    - "Team collaboration features"
+    - "Report generation"
+
+deployment:
+  platform: "vercel"
+  environment_variables:
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - SUPABASE_SERVICE_KEY
+    - STRIPE_SECRET_KEY
+    - SENDGRID_API_KEY
+    - SLACK_WEBHOOK_URL
+
+  domains:
+    production: "crm.example.com"
+    staging: "staging-crm.example.com"
+
+progress:
+  last_updated: "2024-01-01"
+  completion_percentage: 0
+
+  completed_milestones: []
+
+  upcoming_milestones:
+    - milestone: "Core CRM Launch"
+      target_date: "2024-02-01"
+
+    - milestone: "Pipeline Features"
+      target_date: "2024-02-15"
+
+    - milestone: "Team Features"
+      target_date: "2024-03-01"
+
+notes: |
+  - Focus on small business needs initially
+  - Real-time updates critical for team collaboration
+  - Consider Salesforce/HubSpot import in future
+  - Mobile app should be considered for phase 2
+  - Activity timeline is key differentiator
