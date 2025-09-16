@@ -220,8 +220,11 @@ export class DatabaseConfigBuilder {
 }
 
 // Export convenience function
-export async function createDatabaseClient(config: DatabaseConfig): Promise<DatabaseClient> {
-  return DatabaseFactory.createClient(config);
+export async function createDatabaseClient(config?: DatabaseConfig): Promise<DatabaseClient> {
+  if (config) {
+    return DatabaseFactory.createClient(config);
+  }
+  return DatabaseFactory.createFromEnvironment();
 }
 
 export { DatabaseFactory as default };

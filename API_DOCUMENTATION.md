@@ -248,6 +248,146 @@ const usersWithPosts = await client.prisma.user.findMany({
 
 ---
 
+## Multi-Tenant Domain Management
+
+### Domain Management Endpoints
+
+The template includes comprehensive multi-tenant domain management with subdomain and custom domain support.
+
+#### Create Domain
+```http
+POST /api/domains
+Content-Type: application/json
+
+{
+  "tenant_id": "tenant_123",
+  "domain": "example.com",
+  "type": "custom",
+  "verification_method": "dns"
+}
+
+Response:
+{
+  "data": {
+    "id": "domain_456",
+    "tenant_id": "tenant_123",
+    "domain": "example.com",
+    "type": "custom",
+    "status": "pending",
+    "verification_token": "abc123..."
+  },
+  "verification_records": [
+    {
+      "type": "TXT",
+      "name": "_saas-verify.example.com",
+      "value": "abc123..."
+    }
+  ]
+}
+```
+
+#### Get Domains by Tenant
+```http
+GET /api/domains?tenant_id=tenant_123
+
+Response:
+{
+  "data": [
+    {
+      "id": "domain_456",
+      "domain": "example.com",
+      "type": "custom",
+      "status": "verified",
+      "ssl_enabled": true,
+      "ssl_status": "active"
+    }
+  ]
+}
+```
+
+#### Verify Domain
+```http
+POST /api/domains/verify
+Content-Type: application/json
+
+{
+  "domain_id": "domain_456"
+}
+
+Response:
+{
+  "data": {
+    "domain_id": "domain_456",
+    "status": "verified",
+    "ssl_status": "active",
+    "verification_results": {
+      "ownership_verified": true,
+      "dns_configured": true,
+      "ssl_verified": true
+    }
+  }
+}
+```
+
+### Tenant Management Endpoints
+
+#### Create Tenant
+```http
+POST /api/tenants
+Content-Type: application/json
+
+{
+  "name": "ACME Corporation",
+  "slug": "acme",
+  "plan": "pro",
+  "owner_id": "user_123"
+}
+
+Response:
+{
+  "data": {
+    "id": "tenant_789",
+    "name": "ACME Corporation",
+    "slug": "acme",
+    "plan": "pro",
+    "status": "active",
+    "owner_id": "user_123"
+  }
+}
+```
+
+#### Get Current Tenant
+```http
+GET /api/tenant/current
+Host: acme.yoursaas.com
+
+Response:
+{
+  "tenant_id": "tenant_789",
+  "tenant_name": "ACME Corporation",
+  "tenant_slug": "acme",
+  "domain_type": "subdomain",
+  "current_domain": "acme.yoursaas.com",
+  "domains": [...]
+}
+```
+
+### Domain Types
+
+#### Subdomain Configuration
+- **Format**: `{slug}.yoursaas.com`
+- **Auto-verified**: Subdomains are automatically verified
+- **SSL**: Handled by wildcard certificate
+- **Creation**: Automatically created with tenant
+
+#### Custom Domain Configuration
+- **Format**: Any valid domain (e.g., `app.customer.com`)
+- **Verification**: DNS-based ownership verification required
+- **SSL**: Automatic certificate provisioning
+- **DNS Records**: TXT, CNAME, and A records required
+
+---
+
 ## Authentication Systems
 
 ### Authentication Factory

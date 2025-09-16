@@ -1,12 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ratelimit } from '@/lib/ratelimit';
+import { parseDomain, extractTenantIdentifier, DomainInfo } from '@/lib/domain';
+
+/**
+ * Handle domain-based routing for multi-tenant architecture
+ */
+async function handleDomainRouting(
+  request: NextRequest,
+  domainInfo: DomainInfo,
+  tenantIdentifier: string | null
+): Promise<NextResponse | null> {
+  const { pathname } = request.nextUrl;
+
+  // Skip domain routing for API routes and auth routes
+  if (pathname.startsWith('/api/') || pathname.startsWith('/auth/')) {
+    return null;
+  }
+
+  // Handle root domain (non-tenant) requests
+  if (!tenantIdentifier) {
+    // Redirect to main marketing site or dashboard
+    if (pathname === '/') {
+      return null; // Allow normal processing
+    }
+    return null;
+  }
+
+  // Handle tenant-specific routing
+  if (domainInfo.isSubdomain || domainInfo.isCustomDomain) {
+    // Check if tenant exists (you'll need to implement this)
+    const tenantExists = await checkTenantExists(tenantIdentifier);
+
+    if (!tenantExists) {
+      // Redirect to tenant not found page
+      return NextResponse.redirect(new URL('/tenant-not-found', request.url));
+    }
+
+    // Rewrite to tenant-specific routes
+    if (pathname === '/') {
+      // Rewrite root to tenant dashboard
+      const url = request.nextUrl.clone();
+      url.pathname = '/tenant/dashboard';
+      return NextResponse.rewrite(url);
+    }
+
+    // Rewrite other tenant routes
+    if (!pathname.startsWith('/tenant/')) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/tenant${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Check if tenant exists (placeholder - implement with your database)
+ */
+async function checkTenantExists(identifier: string): Promise<boolean> {
+  // TODO: Implement actual tenant lookup
+  // For now, return true to allow development
+  if (process.env.NODE_ENV === 'development') {
+    return true;
+  }
+
+  try {
+    // This would query your database to check if tenant exists
+    // const tenant = await db.getTenantBySlug(identifier) || await db.getTenantByDomain(identifier);
+    // return !!tenant;
+    return true; // Temporary
+  } catch (error) {
+    console.error('Error checking tenant existence:', error);
+    return false;
+  }
+}
 
 /**
  * Enterprise-grade middleware for security, rate limiting, and monitoring
  * Runs on all requests before they reach the application
  */
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next();
   const { pathname } = request.nextUrl;
   const startTime = Date.now();
 
@@ -16,7 +90,30 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/favicon.ico') ||
     pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf)$/)
   ) {
-    return response;
+    return NextResponse.next();
+  }
+
+  // Parse domain information
+  const host = request.headers.get('host');
+  if (!host) {
+    return new NextResponse('Invalid host', { status: 400 });
+  }
+
+  const domainInfo = parseDomain(host);
+  const tenantIdentifier = extractTenantIdentifier(domainInfo);
+
+  // Handle domain-based routing
+  const domainResponse = await handleDomainRouting(request, domainInfo, tenantIdentifier);
+  if (domainResponse) {
+    return domainResponse;
+  }
+
+  const response = NextResponse.next();
+
+  // Add tenant context to headers
+  if (tenantIdentifier) {
+    response.headers.set('X-Tenant-Identifier', tenantIdentifier);
+    response.headers.set('X-Domain-Type', domainInfo.isSubdomain ? 'subdomain' : 'custom');
   }
 
   try {

@@ -264,6 +264,20 @@ const nextConfig = {
           },
         ],
       },
+      // Tenant-specific routes
+      {
+        source: '/tenant/:path*',
+        headers: [
+          {
+            key: 'X-Tenant-Route',
+            value: 'true',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=300, s-maxage=600',
+          },
+        ],
+      },
     ];
   },
   // API routes configuration
@@ -275,6 +289,7 @@ const nextConfig = {
       },
     ];
   },
+
 };
 
 module.exports = nextConfig;

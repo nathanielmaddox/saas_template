@@ -16,6 +16,7 @@ export interface User {
   avatar?: string;
   role: 'user' | 'admin' | 'member' | 'owner';
   status: 'active' | 'inactive' | 'suspended' | 'pending';
+  tenant_id?: string;
   subscription?: Subscription;
   metadata?: Record<string, any>;
   created_at: string;
@@ -38,12 +39,48 @@ export interface Subscription {
 export interface Project {
   id: string;
   user_id: string;
+  tenant_id: string;
   name: string;
   description?: string;
   status: 'active' | 'archived' | 'deleted';
   settings?: Record<string, any>;
   created_at: string;
   updated_at: string;
+}
+
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string; // subdomain
+  plan: 'free' | 'pro' | 'enterprise';
+  status: 'active' | 'suspended' | 'deleted';
+  owner_id: string;
+  settings?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Domain {
+  id: string;
+  tenant_id: string;
+  domain: string;
+  type: 'subdomain' | 'custom';
+  status: 'pending' | 'verified' | 'failed' | 'expired';
+  verification_token?: string;
+  verification_method: 'dns' | 'file' | 'cname';
+  ssl_enabled: boolean;
+  ssl_status: 'pending' | 'active' | 'failed' | 'expired';
+  created_at: string;
+  updated_at: string;
+  verified_at?: string;
+}
+
+export interface DomainVerification {
+  domain: string;
+  type: 'TXT' | 'CNAME' | 'A';
+  name: string;
+  value: string;
+  priority?: number;
 }
 
 export interface ApiResponse<T> {
@@ -97,6 +134,22 @@ export interface DatabaseClient {
   getSubscription(userId: string): Promise<ApiResponse<Subscription>>;
   updateSubscription(userId: string, data: Partial<Subscription>): Promise<ApiResponse<Subscription>>;
   cancelSubscription(userId: string): Promise<ApiResponse<Subscription>>;
+
+  // Tenant operations
+  createTenant(data: Partial<Tenant>): Promise<ApiResponse<Tenant>>;
+  getTenant(tenantId: string): Promise<ApiResponse<Tenant>>;
+  getTenantBySlug(slug: string): Promise<ApiResponse<Tenant>>;
+  getTenantByDomain(domain: string): Promise<ApiResponse<Tenant>>;
+  updateTenant(tenantId: string, data: Partial<Tenant>): Promise<ApiResponse<Tenant>>;
+  deleteTenant(tenantId: string): Promise<ApiResponse<{ success: boolean }>>;
+
+  // Domain operations
+  createDomain(data: Partial<Domain>): Promise<ApiResponse<Domain>>;
+  getDomain(domainId: string): Promise<ApiResponse<Domain>>;
+  getDomainsByTenant(tenantId: string): Promise<ApiResponse<Domain[]>>;
+  updateDomain(domainId: string, data: Partial<Domain>): Promise<ApiResponse<Domain>>;
+  deleteDomain(domainId: string): Promise<ApiResponse<{ success: boolean }>>;
+  verifyDomain(domainId: string): Promise<ApiResponse<DomainVerification[]>>;
 
   // Real-time subscriptions (if supported)
   subscribe?<T>(table: string, filter?: Record<string, any>, callback?: (data: T) => void): Promise<() => void>;
