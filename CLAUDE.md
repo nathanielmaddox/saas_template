@@ -203,64 +203,43 @@ import { instantdb } from '@/lib/database/providers/instantdb';
 
 ## Testing Strategy
 
-### CRITICAL: Automatic Playwright MCP Testing on UI Changes
-**⚠️ MANDATORY**: When ANY of the following UI changes occur, you MUST immediately invoke Playwright MCP for multi-viewport testing:
+### Playwright MCP Testing (On-Demand)
+**Optional Testing**: Playwright MCP is available for multi-viewport testing when explicitly requested or needed for specific UI validation.
 
-#### Triggers for Immediate Playwright MCP Testing:
-1. **Component Changes**:
-   - Creating new components in `src/components/`
-   - Modifying existing component JSX/TSX structure
-   - Updating component props or state management
-   - Adding/removing UI elements
+#### When to Use Playwright MCP Testing:
+- When explicitly requested by the user
+- When visual regression testing is needed
+- Before major releases or deployments
+- When testing complex UI interactions
+- For cross-browser compatibility verification
 
-2. **Styling Changes**:
-   - Tailwind CSS class modifications
-   - Theme or color scheme updates
-   - Responsive breakpoint changes
-   - Animation or transition updates
+#### Available Test Scenarios:
+1. **Component Testing**: Test specific components in isolation
+2. **Page Testing**: Full page rendering across viewports
+3. **Interaction Testing**: Forms, buttons, and user flows
+4. **Responsive Testing**: Layout behavior across screen sizes
+5. **Visual Regression**: Compare against baseline screenshots
 
-3. **Page/Route Changes**:
-   - New pages in `src/app/`
-   - Layout modifications
-   - Navigation structure changes
-   - Route parameter updates
-
-4. **Form Changes**:
-   - Form field additions/removals
-   - Validation logic updates
-   - Submit handler modifications
-   - Error message changes
-
-5. **Interactive Elements**:
-   - Button click handlers
-   - Modal/dialog implementations
-   - Dropdown/select modifications
-   - Toggle/switch updates
-
-#### Playwright MCP Testing Protocol:
+#### Playwright MCP Testing Usage:
 ```bash
-# AUTOMATICALLY TRIGGERED - DO NOT SKIP
-# When UI changes detected, immediately:
-1. Save all file changes
-2. Invoke Playwright MCP with test scenario
-3. Capture screenshots across all 8 viewports
-4. Store results in .claude/playwright-mcp/changes/
-5. Analyze results for visual consistency
-6. Report any issues to UI Development Lead
+# Run when requested or needed:
+# Usage: Invoke Playwright MCP with specific test scenario
+# Captures screenshots across 8 viewports (3 mobile, 2 tablet, 3 desktop)
+# Stores results in .claude/playwright-mcp/changes/
 ```
 
 ### Test Structure
 - **Unit Tests**: `src/**/__tests__/` or `src/**/*.test.tsx`
 - **Component Tests**: React Testing Library with Jest
 - **API Tests**: Mock Xano client for API route testing
-- **E2E Tests**: Playwright MCP for ALL UI changes (MANDATORY)
-- **Visual Tests**: Automatic screenshot capture via Playwright MCP
+- **E2E Tests**: Playwright MCP available on-demand for UI validation
+- **Visual Tests**: Screenshot capture via Playwright MCP when requested
 
 ### Playwright MCP Integration
 - **Screenshot Storage**: `.claude/playwright-mcp/changes/[session_id]/`
-- **Viewport Testing**: 8 viewports (3 mobile, 2 tablet, 3 desktop) - ALWAYS TEST ALL
-- **Test Reports**: Markdown reports with visual evidence
-- **Agent Coordination**: Results shared with Frontend Testing, UI Lead, and QA Manager
+- **Viewport Testing**: 8 viewports (3 mobile, 2 tablet, 3 desktop) available
+- **Test Reports**: Markdown reports with visual evidence when generated
+- **Agent Coordination**: Results can be shared with Frontend Testing, UI Lead, and QA Manager when needed
 
 ### Testing Utilities
 - **Module Aliases**: Use `@/` prefix for imports (configured in `jest.config.js`)
@@ -354,39 +333,37 @@ docker-compose up --build
 2. **API**: Document endpoints in `yaml/api-endpoints.yml`
 3. **Types**: Define TypeScript interfaces
 4. **Components**: Create reusable UI components
-5. **⚠️ PLAYWRIGHT TESTING**: IMMEDIATELY run Playwright MCP for ANY UI changes
-6. **Tests**: Write unit tests for new functionality
-7. **Documentation**: Update relevant documentation
+5. **Tests**: Write unit tests for new functionality
+6. **Documentation**: Update relevant documentation
+7. **Optional Testing**: Run Playwright MCP if visual testing is needed
 
-## CRITICAL UI Testing Requirements
+## UI Testing Options
 
-### ⚠️ MANDATORY Playwright MCP Execution
-**YOU MUST IMMEDIATELY INVOKE PLAYWRIGHT MCP WHEN**:
-- Creating or modifying ANY React/Next.js component
-- Changing ANY Tailwind CSS classes or styles
-- Adding or updating ANY page in `src/app/`
-- Modifying ANY form, button, or interactive element
-- Updating ANY navigation or routing logic
-- Changing ANY responsive design breakpoints
-- Adding or removing ANY UI elements
+### Playwright MCP Testing (Optional)
+Playwright MCP is available for comprehensive UI testing when needed:
+
+#### When to Consider Playwright Testing:
+- User explicitly requests visual testing
+- Testing complex UI interactions or animations
+- Validating responsive design across devices
+- Before major deployments or releases
+- When visual regression testing is beneficial
 
 ### Playwright MCP Command Structure
-When UI changes are made, IMMEDIATELY execute:
+When Playwright testing is requested or needed:
 ```typescript
-// REQUIRED: Invoke Playwright MCP for UI testing
+// Optional: Invoke Playwright MCP for UI testing
 await playwrightMCP.test({
   scenario: "Test [specific feature/component]",
-  viewports: "all", // ALWAYS test all 8 viewports
+  viewports: "all", // Tests 8 viewports (3 mobile, 2 tablet, 3 desktop)
   captureScreenshots: true,
   storageLocation: ".claude/playwright-mcp/changes/",
   notifyAgents: ["frontend-testing", "ui-development-lead", "quality-assurance-manager"]
 });
 ```
 
-### NO EXCEPTIONS Policy
-- **DO NOT** skip Playwright testing "to save time"
-- **DO NOT** assume changes are "too small" to test
-- **DO NOT** defer testing to later
-- **ALWAYS** test immediately after UI changes
-- **ALWAYS** capture screenshots for all 8 viewports
-- **ALWAYS** store results in the designated changes folder
+### Testing Best Practices
+- Use unit tests for logic validation
+- Use Playwright MCP when visual testing adds value
+- Focus on critical user paths and interactions
+- Consider testing effort vs. benefit for each scenario

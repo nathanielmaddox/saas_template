@@ -65,7 +65,7 @@ Actions:
 
 ### 2. Screen Size Testing Protocol
 
-**MANDATORY**: Test all viewports for every flow
+**RECOMMENDED**: Test relevant viewports based on testing needs
 
 ```yaml
 Viewports:

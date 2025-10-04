@@ -1,38 +1,38 @@
-# Automatic Playwright MCP Testing Protocol
+# Playwright MCP Testing Protocol (On-Demand)
 
 ## Overview
-This document defines the automatic testing protocol that MUST be followed whenever UI changes are detected in the codebase.
+This document defines the testing protocol for using Playwright MCP when UI testing is requested or deemed necessary for the codebase.
 
-## Immediate Testing Requirements
+## When to Use Playwright MCP Testing
 
-### ⚠️ CRITICAL: Zero-Tolerance Policy
-**NO UI CHANGES are permitted without immediate Playwright MCP testing.**
+### Recommended Scenarios
+- User explicitly requests UI testing
+- Before major releases or deployments
+- Testing complex UI interactions or animations
+- Validating responsive design across multiple devices
+- Visual regression testing is needed
+- Cross-browser compatibility verification required
+- Accessibility compliance validation needed
 
-Any attempt to bypass this requirement is considered a critical quality violation.
-
-## Step-by-Step Auto-Testing Protocol
-
-### Phase 1: Change Detection (Automatic)
+### Optional Testing Triggers
 ```yaml
-Trigger_Detection:
-  - File save events in UI directories
-  - Git staging of UI files
-  - Component creation/modification
-  - Style sheet updates
-  - Page route changes
-
-Immediate_Response:
-  - Pause development workflow
-  - Queue Playwright MCP execution
-  - Prepare test environment
+Optional_Triggers:
+  - New component creation (when visual testing adds value)
+  - Significant styling changes
+  - Complex form implementations
+  - Critical user journey modifications
+  - Payment or checkout flow changes
+  - Authentication flow updates
 ```
 
-### Phase 2: Pre-Test Setup (Automatic)
+## Testing Protocol When Invoked
+
+### Phase 1: Pre-Test Setup
 ```yaml
 Environment_Check:
   - Verify development server running (localhost:3000)
   - Ensure browser installation complete
-  - Clear previous test artifacts
+  - Clear previous test artifacts if needed
   - Create new test session ID
 
 Test_Preparation:
@@ -42,7 +42,7 @@ Test_Preparation:
   - Set viewport configurations
 ```
 
-### Phase 3: Playwright MCP Execution (Mandatory)
+### Phase 2: Playwright MCP Execution
 ```yaml
 Test_Execution_Order:
   1. Mobile Viewports (iPhone SE, iPhone 14 Pro, Samsung Galaxy S21)
@@ -53,227 +53,139 @@ For_Each_Viewport:
   1. Navigate to target page/component
   2. Wait for page load completion
   3. Capture initial state screenshot
-  4. Execute user interactions (if applicable)
+  4. Execute user interactions (if specified)
   5. Capture interaction results
   6. Check for console errors
-  7. Validate accessibility compliance
+  7. Validate accessibility compliance (if requested)
   8. Record network requests
   9. Save all artifacts
 ```
 
-### Phase 4: Results Analysis (Automatic)
+### Phase 3: Results Analysis
 ```yaml
 Quality_Checks:
-  - Screenshot comparison with previous versions
+  - Screenshot comparison with baseline (if available)
   - Console error detection and reporting
   - Accessibility violation identification
   - Network request failure detection
   - Performance metric collection
 
 Pass_Criteria:
-  - No console errors
-  - No accessibility violations
+  - No critical console errors
+  - No blocking accessibility violations
   - All screenshots captured successfully
-  - No network request failures
-  - UI renders correctly on all viewports
+  - Core functionality working
+  - UI renders correctly on tested viewports
 ```
 
-### Phase 5: Reporting & Notification (Automatic)
+### Phase 4: Reporting
 ```yaml
 Report_Generation:
   - Create markdown test report
   - Include all screenshots
   - Document any issues found
   - Generate summary statistics
-  - Create action items for failures
+  - Create recommendations for improvements
 
-Agent_Notification:
-  Primary: frontend-testing, ui-development-lead, quality-assurance-manager
-  Secondary: performance-optimizer (if issues), security-audit (if violations)
+Stakeholder_Communication:
+  - Share results with requesting party
+  - Highlight critical issues if found
+  - Provide actionable feedback
 ```
 
-## Mandatory Test Scenarios by Change Type
+## Test Scenarios by Component Type
 
-### New Component Creation
+### Component Testing
 ```yaml
-Required_Tests:
+Standard_Tests:
   1. Component Rendering:
-     - Verify component loads without errors
-     - Check all props render correctly
-     - Validate default state appearance
+     - Verify component loads
+     - Check props render correctly
+     - Validate default state
 
   2. Responsive Behavior:
-     - Test mobile layout (375px, 393px, 360px)
-     - Test tablet layout (768px, 834px)
-     - Test desktop layout (1366px, 1920px, 2560px)
-
-  3. Interactive Elements:
-     - Click all buttons/links
-     - Test form inputs (if present)
-     - Verify hover states
-     - Check focus states for accessibility
-
-  4. State Management:
-     - Test loading states
-     - Test error states
-     - Test success states
-     - Test empty states
-```
-
-### Form Modifications
-```yaml
-Required_Tests:
-  1. Form Functionality:
-     - Fill all fields with valid data
-     - Submit form and verify success
-     - Test field validation errors
-     - Test form reset functionality
-
-  2. Mobile Usability:
-     - Test keyboard appearance on mobile
-     - Verify input field zoom behavior
-     - Check form submission on mobile
-     - Test touch interactions
-
-  3. Error Handling:
-     - Test network error scenarios
-     - Test validation error display
-     - Test field highlighting
-     - Test error message clarity
-```
-
-### Navigation Changes
-```yaml
-Required_Tests:
-  1. Navigation Flow:
-     - Test all navigation links
-     - Verify mobile menu functionality
-     - Check breadcrumb accuracy
-     - Test back/forward navigation
-
-  2. Responsive Navigation:
-     - Test hamburger menu on mobile
-     - Check navigation collapse behavior
-     - Verify dropdown menus
-     - Test touch navigation
-
-  3. Active States:
-     - Verify current page highlighting
-     - Test navigation state persistence
-     - Check deep linking behavior
-```
-
-### Styling Updates
-```yaml
-Required_Tests:
-  1. Visual Consistency:
-     - Screenshot all affected components
-     - Compare with previous versions
-     - Check theme consistency
-     - Verify dark mode compatibility
-
-  2. Responsive Design:
-     - Test all breakpoint transitions
+     - Test key breakpoints
      - Verify layout stability
      - Check content overflow
-     - Test element positioning
 
-  3. Interactive States:
-     - Test hover effects
-     - Check focus indicators
-     - Verify active states
-     - Test disabled states
+  3. Interactive Elements (if applicable):
+     - Test user interactions
+     - Verify state changes
+     - Check feedback mechanisms
 ```
 
-## Failure Response Protocol
-
-### When Tests Fail
+### Form Testing
 ```yaml
-Immediate_Actions:
-  1. STOP all development work on affected component
-  2. Generate detailed failure report
-  3. Notify all relevant agents immediately
-  4. Create priority fix task list
-  5. Re-run tests after each fix attempt
+Standard_Tests:
+  1. Form Functionality:
+     - Test form submission
+     - Verify validation
+     - Check error handling
 
-Escalation_Path:
-  Level_1: frontend-testing agent (< 5 minutes)
-  Level_2: ui-development-lead (< 15 minutes)
-  Level_3: quality-assurance-manager (< 30 minutes)
-  Level_4: technical-executive (< 1 hour)
-
-Resolution_Requirements:
-  - All tests must pass before continuing development
-  - Visual inconsistencies must be resolved
-  - Console errors must be eliminated
-  - Accessibility violations must be fixed
+  2. User Experience:
+     - Test field interactions
+     - Verify mobile usability
+     - Check accessibility features
 ```
 
-### Critical Failure Types
+### Navigation Testing
 ```yaml
-Blocking_Issues:
-  - Component fails to render
-  - JavaScript errors in console
-  - Accessibility violations (WCAG Level A/AA)
-  - Layout breaks on any viewport
-  - Form submission failures
-  - Navigation broken
+Standard_Tests:
+  1. Navigation Flow:
+     - Test navigation links
+     - Verify routing behavior
+     - Check mobile menu
 
-Warning_Issues:
-  - Performance degradation
-  - Visual inconsistencies
-  - Minor accessibility warnings
-  - Network request delays
-  - Console warnings (non-error)
+  2. User Experience:
+     - Test responsive behavior
+     - Verify state persistence
+     - Check deep linking
 ```
 
 ## Quality Gates
 
-### Before Proceeding with Development
+### Recommended Pass Criteria
 ```yaml
-Must_Pass_All:
-  ✅ All 8 viewports tested successfully
-  ✅ All screenshots captured without errors
-  ✅ No console errors detected
-  ✅ No critical accessibility violations
-  ✅ All user flows completable
-  ✅ Form submissions working (if applicable)
-  ✅ Navigation functional
-  ✅ Mobile usability confirmed
+Should_Pass:
+  ✅ Core functionality working
+  ✅ No blocking errors
+  ✅ Acceptable visual presentation
+  ✅ Basic accessibility compliance
+  ✅ Mobile usability functional
 ```
 
-### Success Metrics
+### Critical Issues (Should Fix)
 ```yaml
-Target_KPIs:
-  - Test execution time: < 5 minutes per session
-  - Screenshot capture rate: 100%
-  - Console error rate: 0%
-  - Accessibility pass rate: 100%
-  - Mobile usability score: > 90%
-  - Cross-viewport consistency: > 95%
+High_Priority:
+  - Component fails to render
+  - JavaScript errors blocking functionality
+  - Critical accessibility violations
+  - Complete layout breakdown
+  - Form submission failures
+  - Navigation completely broken
 ```
 
 ## Integration Commands
 
 ### Claude Code Integration
 ```typescript
-// This protocol MUST be executed automatically
+// Execute when testing is requested or beneficial
 
-async function executeUIChangeProtocol(changedFiles: string[]) {
-  // 1. Validate changes require testing
-  const requiresTesting = validateUIChanges(changedFiles);
-  if (!requiresTesting) return;
+async function executeUITestProtocol(testConfig: TestConfig) {
+  // 1. Confirm testing is needed
+  const shouldTest = confirmTestingRequired(testConfig);
+  if (!shouldTest) return;
 
   // 2. Generate test session
   const sessionId = generateSessionId();
 
   // 3. Execute Playwright MCP
-  const results = await playwrightMCP.executeFullTest({
+  const results = await playwrightMCP.executeTest({
     sessionId,
-    changedFiles,
-    viewports: getAllViewports(),
+    scope: testConfig.scope,
+    viewports: testConfig.viewports || getDefaultViewports(),
     captureScreenshots: true,
-    runAccessibilityTests: true,
+    runAccessibilityTests: testConfig.includeAccessibility || false,
     outputPath: `.claude/playwright-mcp/changes/${sessionId}/`
   });
 
@@ -283,37 +195,51 @@ async function executeUIChangeProtocol(changedFiles: string[]) {
   // 5. Generate report
   await generateTestReport(sessionId, results, analysis);
 
-  // 6. Notify agents
-  await notifyRelevantAgents(results, analysis);
-
-  // 7. Block development if failures
-  if (analysis.hasBlockingIssues) {
-    throw new Error('Critical UI issues detected. Development blocked until resolved.');
-  }
+  // 6. Return results
+  return { sessionId, results, analysis };
 }
 ```
 
-## Monitoring and Compliance
+## Best Practices
 
-### Daily Metrics
-- UI changes tested: Should be 100%
+### Efficient Testing
+- Focus on critical user paths
+- Test representative viewports
+- Use baseline comparisons when available
+- Balance thoroughness with efficiency
+
+### When to Skip Playwright Testing
+- Minor text changes
+- Backend-only modifications
+- Configuration updates
+- Documentation changes
+- Non-visual code refactoring
+
+### Testing Frequency Recommendations
+- Major features: Always test
+- UI components: Test when visual validation needed
+- Bug fixes: Test if UI-related
+- Refactoring: Test if UI affected
+- Performance updates: Test if visible changes
+
+## Monitoring and Improvement
+
+### Metrics to Track
+- Tests executed per week
 - Average test execution time
-- Failure rate by component type
-- Most common issue types
-- Agent response times
+- Issues found vs. development time
+- False positive rate
+- Test coverage of critical paths
 
-### Weekly Reports
-- Testing coverage analysis
-- Quality trend analysis
-- Performance impact assessment
-- Agent effectiveness review
-- Process improvement recommendations
-
-### Quality Assurance
-This protocol is subject to continuous monitoring and improvement. Any violations or suggestions for enhancement should be reported to the Quality Assurance Manager Agent immediately.
+### Process Improvement
+- Regularly review test effectiveness
+- Update test scenarios based on findings
+- Optimize viewport selection
+- Improve baseline management
+- Enhance reporting clarity
 
 ---
-**Version**: 1.0.0
-**Last Updated**: 2025-09-15
-**Compliance Level**: MANDATORY
-**Review Frequency**: Weekly
+**Version**: 2.0.0
+**Last Updated**: 2025-01-04
+**Usage**: ON-DEMAND
+**Review Frequency**: Monthly
